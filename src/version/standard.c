@@ -721,9 +721,7 @@ void standard_init_ng(GAMEINFO *game, INI *ini)
 	}
 	else
 		window_caption = "NAGI";
-	SDL_Window* window = vid_get_main_window();
-	if(window)
-		SDL_SetWindowTitle(window,window_caption);
+	SDL_WM_SetCaption(window_caption, 0);
 }
 
 

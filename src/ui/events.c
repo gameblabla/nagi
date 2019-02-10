@@ -21,10 +21,21 @@ AGI_EVENT stop_ego = {2, 0};
 void events_init()
 {
 	SDL_EventState(SDL_SYSWMEVENT, SDL_IGNORE);
+	SDL_EventState(SDL_VIDEORESIZE, SDL_IGNORE);
 	SDL_EventState(SDL_USEREVENT, SDL_IGNORE);
+	SDL_EventState(SDL_ACTIVEEVENT, SDL_IGNORE);
 	SDL_EventState(SDL_JOYAXISMOTION, SDL_IGNORE);
 	SDL_EventState(SDL_JOYBALLMOTION, SDL_IGNORE);
 	SDL_EventState(SDL_JOYHATMOTION, SDL_IGNORE);
+	SDL_EventState(SDL_QUIT, SDL_IGNORE);
+	
+	SDL_EnableUNICODE(1);
+
+	if (SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL) != 0)
+	{
+		printf("Couldn't enable key repeat: %s\n", SDL_GetError());
+		exit(1);
+	}
 	
 	events_clear();
 	
@@ -40,14 +51,14 @@ KEY dir_map[]={ {SDLK_UP, 1}, {SDLK_PAGEUP, 2},
 			{SDLK_RIGHT, 3}, {SDLK_PAGEDOWN, 4},
 			{SDLK_DOWN, 5}, {SDLK_END, 6}, 
 			{SDLK_LEFT, 7}, {SDLK_HOME, 8} , 
-			{SDLK_KP_8, 1},	{SDLK_KP_9, 2},
-			{SDLK_KP_6, 3},	{SDLK_KP_3, 4},
-			{SDLK_KP_2, 5},	{SDLK_KP_1, 6},
-			{SDLK_KP_4, 7},	{SDLK_KP_7, 8},
+			{SDLK_KP8, 1},	{SDLK_KP9, 2},
+			{SDLK_KP6, 3},	{SDLK_KP3, 4},
+			{SDLK_KP2, 5},	{SDLK_KP1, 6},
+			{SDLK_KP4, 7},	{SDLK_KP7, 8},
 		{0,0}};
 
 // map directions to key symbols
-u16 dir_keymap(SDL_Keysym *keysym)
+u16 dir_keymap(SDL_keysym *keysym)
 {	
 	KEY *k = dir_map;
 	
@@ -79,7 +90,7 @@ u16 system_alt_map[] = {30, 48, 46, 32, 18, 33, 34, 35, 23, 36, 37, 38, 50,
 // map the keys depending on system (ibm in this case)
 // TODO write amiga?  apple ][.. um.. mac??  why don't I scratch my ass?
 // for the next gen of agi.. define a set of keys? that's the same over systems?
-u16 system_keymap(SDL_Keysym *keysym)
+u16 system_keymap(SDL_keysym *keysym)
 {
 	if (  (keysym->sym >= SDLK_F1) && (keysym->sym <= SDLK_F10)  )
 	{
@@ -127,7 +138,7 @@ u16 system_keymap(SDL_Keysym *keysym)
 
 // if the key is a direction, then map it to that
 // else, return the ascii thing back
-AGI_EVENT *key_parse(SDL_Keysym *keysym)
+AGI_EVENT *key_parse(SDL_keysym *keysym)
 {
 	u16 direction;
 	AGI_EVENT *agi_event = &passed_agi_event;
@@ -161,7 +172,7 @@ KEY key_special[] = { {SDLK_HOME, 0}, {SDLK_UP, 0},
 if it's alternative walk mode, when the player lifts the arrow key, the ego should stop 
 otherwise, it's a waste of space
 */
-AGI_EVENT *event_key_up(SDL_Keysym *keysym)
+AGI_EVENT *event_key_up(SDL_keysym *keysym)
 {
 	KEY *k = key_special;
 	AGI_EVENT *agi_event = 0;
@@ -179,7 +190,7 @@ AGI_EVENT *event_key_up(SDL_Keysym *keysym)
 	return agi_event;
 }
 
-AGI_EVENT *event_key_down(SDL_Keysym *keysym)
+AGI_EVENT *event_key_down(SDL_keysym *keysym)
 {
 	KEY *k = key_special;
 	KEY *t;
@@ -188,13 +199,13 @@ AGI_EVENT *event_key_down(SDL_Keysym *keysym)
 	//printf("%d\n", keysym->sym);
 	switch (keysym->sym)
 	{
-		case SDLK_KP_5:
+		case SDLK_KP5:
 		case SDLK_CLEAR:
 			//printf("keypad 5 detected(%d)\n", keysym->sym);
 			agi_event = &stop_ego;	// stop player
 			break;
 		
-		case SDLK_SCROLLLOCK:
+		case SDLK_SCROLLOCK:
 			if (trace_state == 0)
 				trace_init();
 			else
@@ -286,11 +297,8 @@ AGI_EVENT *event_read(void)
 {
 	SDL_Event event;
 	AGI_EVENT *agi_event;
-	SDL_Window* window;
-	u8 c;
 	
 	agi_event = 0;
-	c = 0;
 	
 	while (  (SDL_PollEvent(&event) != 0) && (agi_event == 0)  )
 	{
@@ -311,28 +319,11 @@ AGI_EVENT *event_read(void)
 			case SDL_MOUSEBUTTONDOWN:
 				agi_event = event_mouse_button(event.button.button,event.button.x,event.button.y);
 				break;
-
+				
 			case SDL_QUIT:
 				cmd_quit(&c);
 				break;
-
-			case SDL_WINDOWEVENT:
-				switch( event.window.event)
-				{
-					case SDL_WINDOWEVENT_RESIZED:
-						vid_resize(event.window.data1,
-							event.window.data2);
-						break;
-					case SDL_WINDOWEVENT_CLOSE:
-						window = vid_get_main_window();
-						if(SDL_GetWindowID(window) == event.window.windowID){
-							cmd_quit(&c);
-						}
-						break;
-				}
-			
-				break;
-
+				
 			default:
 				;
 		}
