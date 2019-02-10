@@ -24,7 +24,6 @@
 
 /* OTHER headers	---	---	---	---	---	---	--- */
 #include "../sys/ini_config.h"
-#include "../config.h"
 #include "../ui/string.h"
 #include "../sys/agi_file.h"
 #include "agi_crc.h"

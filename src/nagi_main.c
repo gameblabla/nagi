@@ -54,8 +54,6 @@ _Finish                          cseg     000002AE 00000015
 
 #include "list.h"
 
-#include "../config.h"
-
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #endif

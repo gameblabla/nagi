@@ -64,8 +64,6 @@ _RoomInit                        cseg     000012DE 00000015
 
 #include "log.h"
 
-#include "../config.h"
-
 /* PROTOTYPES	---	---	---	---	---	---	--- */
 // reads ini file and inits nagi
 void nagi_init(void);

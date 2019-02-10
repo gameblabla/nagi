@@ -27,7 +27,6 @@ void events_init()
 	SDL_EventState(SDL_JOYAXISMOTION, SDL_IGNORE);
 	SDL_EventState(SDL_JOYBALLMOTION, SDL_IGNORE);
 	SDL_EventState(SDL_JOYHATMOTION, SDL_IGNORE);
-	SDL_EventState(SDL_QUIT, SDL_IGNORE);
 	
 	SDL_EnableUNICODE(1);
 
@@ -295,6 +294,7 @@ AGI_EVENT *event_mouse_button(u8 button, u16 x, u16 y)
 
 AGI_EVENT *event_read(void)
 {
+	uint8_t c = 0;
 	SDL_Event event;
 	AGI_EVENT *agi_event;
 	
@@ -321,6 +321,7 @@ AGI_EVENT *event_read(void)
 				break;
 				
 			case SDL_QUIT:
+				c = 1;
 				cmd_quit(&c);
 				break;
 				
