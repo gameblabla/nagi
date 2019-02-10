@@ -87,12 +87,15 @@ int main(int argc, char *argv[])
 	
 	standard_select_ng();
 
-    #if 0
     if (argc > 1)
+    {
+		/* It needs the slash at the end for some reasons...
+		 * Perhaps it is not doing it by itself ?
+		 * */
+		char fullpath[256];
+		snprintf(fullpath, sizeof(fullpath), "%s/", argv[1]);
         dir_preset_set(DIR_PRESET_GAME, argv[1]);
-    else
-        dir_preset_set_cwd(DIR_PRESET_GAME);
-    #endif
+	}
 
 	agi_init();		// initialise AGI with version
 	delay_init();	// initialise delay
